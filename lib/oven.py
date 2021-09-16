@@ -87,6 +87,7 @@ class TempSensor(threading.Thread):
         self.temperature = 0
         self.bad_percent = 0
         self.time_step = config.sensor_time_wait
+        self.min_relay = config.min_relay_time_wait
         self.noConnection = self.shortToGround = self.shortToVCC = self.unknownError = False
 
 class TempSensorSimulated(TempSensor):
@@ -398,8 +399,23 @@ class RealOven(Oven):
                                self.board.temp_sensor.temperature +
                                config.thermocouple_offset)
 
-        # round to nearest second so we don't have a realy time less than 1 sec
-        heat_on = round(float(self.time_step * pid))
+        # calculate ideal heat_on time
+        heat_on = float(self.time_step * pid)
+
+        # make sure relay is on/off for min_relay time
+        if heat_on < self.min_relay:
+            delta = self.min_realy - heat_on
+            if delta < self.min_relay / 2.0:
+                heat_on = 0.0
+            else:
+                heat_on = self.min_relay
+        elif (self.time_step - heat_on) < min_realy:
+            delta = self.time_step - heat_on
+            if delta >= self.min_relay / 2.0:
+                heat_on = self.time_step - self.min_relay
+            else:
+                heat_on = self.time_step
+            
         heat_off = self.time_step - heat_on
             
             
