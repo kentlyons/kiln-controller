@@ -397,8 +397,12 @@ class RealOven(Oven):
         pid = self.pid.compute(self.target,
                                self.board.temp_sensor.temperature +
                                config.thermocouple_offset)
-        heat_on = float(self.time_step * pid)
-        heat_off = float(self.time_step * (1 - pid))
+
+        # round to nearest second so we don't have a realy time less than 1 sec
+        heat_on = round(float(self.time_step * pid))
+        heat_off = self.time_step - heat_on
+            
+            
 
         # self.heat is for the front end to display if the heat is on
         self.heat = 0.0
