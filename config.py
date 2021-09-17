@@ -28,7 +28,7 @@ currency_type   = "$"   # Currency Symbol to show when calculating cost to run j
 
 ### Outputs
 gpio_heat = 7  # Switches zero-cross solid-state-relay
-gpio_heat_2 = 28  # Switches zero-cross solid-state-relay
+gpio_heat_2 = 8  # Switches zero-cross solid-state-relay
 
 ### Thermocouple Adapter selection:
 #   max31855 - bitbang SPI interface
