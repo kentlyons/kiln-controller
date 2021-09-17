@@ -27,21 +27,23 @@ currency_type   = "$"   # Currency Symbol to show when calculating cost to run j
 #   can use whichever GPIO you prefer/have available.
 
 ### Outputs
-gpio_heat = 23  # Switches zero-cross solid-state-relay
+gpio_heat = 7  # Switches zero-cross solid-state-relay
+gpio_heat_2 = 28  # Switches zero-cross solid-state-relay
 
 ### Thermocouple Adapter selection:
 #   max31855 - bitbang SPI interface
 #   max31856 - bitbang SPI interface. must specify thermocouple_type.
-max31855 = 1
+max6675 = 1
+max31855 = 0
 max31856 = 0
 # see lib/max31856.py for other thermocouple_type, only applies to max31856
 thermocouple_type = MAX31856.MAX31856_S_TYPE
 
 ### Thermocouple Connection (using bitbang interfaces)
-gpio_sensor_cs = 27
-gpio_sensor_clock = 22
-gpio_sensor_data = 17
-gpio_sensor_di = 10 # only used with max31856
+gpio_sensor_cs = 9
+gpio_sensor_clock = 10
+gpio_sensor_data = 11
+gpio_sensor_di = None # only used with max31856
 
 ########################################################################
 #
@@ -50,7 +52,7 @@ gpio_sensor_di = 10 # only used with max31856
 # Every N seconds a decision is made about switching the relay[s] 
 # on & off and for how long. The thermocouple is read 
 # temperature_average_samples times during and the average value is used.
-sensor_time_wait = 40
+sensor_time_wait = 10
 min_relay_time_wait = 1.5
 
 
@@ -81,7 +83,7 @@ stop_integral_windup = True
 ########################################################################
 #
 #   Simulation parameters
-simulate = True
+simulate = False
 sim_t_env      = 60.0   # deg C
 sim_c_heat     = 100.0  # J/K  heat capacity of heat element
 sim_c_oven     = 5000.0 # J/K  heat capacity of oven

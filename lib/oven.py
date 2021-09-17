@@ -20,6 +20,7 @@ class Output(object):
             GPIO.setmode(GPIO.BCM)
             GPIO.setwarnings(False)
             GPIO.setup(config.gpio_heat, GPIO.OUT)
+            GPIO.setup(config.gpio_heat_2, GPIO.OUT)
             self.active = True
             self.GPIO = GPIO
         except:
@@ -29,6 +30,7 @@ class Output(object):
 
     def heat(self,sleepfor, tuning=False):
         self.GPIO.output(config.gpio_heat, self.GPIO.HIGH)
+        self.GPIO.output(config.gpio_heat_2, self.GPIO.HIGH)
         if tuning:
             return
         time.sleep(sleepfor)
@@ -36,6 +38,7 @@ class Output(object):
     def cool(self,sleepfor):
         '''no active cooling, so sleep'''
         self.GPIO.output(config.gpio_heat, self.GPIO.LOW)
+        self.GPIO.output(config.gpio_heat_2, self.GPIO.LOW)
         time.sleep(sleepfor)
 
 # FIX - Board class needs to be completely removed
@@ -104,6 +107,14 @@ class TempSensorReal(TempSensor):
         self.bad_count = 0
         self.ok_count = 0
         self.bad_stamp = 0
+
+        if config.max6675:
+            log.info("init MAX6675")
+            from max6675 import MAX6675
+            self.thermocouple = MAX6675(config.gpio_sensor_cs,
+                                        config.gpio_sensor_clock,
+                                        config.gpio_sensor_data,
+                                        config.temp_scale)
 
         if config.max31855:
             log.info("init MAX31855")
