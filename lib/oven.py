@@ -183,6 +183,7 @@ class Oven(threading.Thread):
         self.daemon = True
         self.temperature = 0
         self.time_step = config.sensor_time_wait
+        self.min_relay = config.min_relay_time_wait
         self.reset()
 
     def reset(self):
