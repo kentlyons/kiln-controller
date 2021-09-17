@@ -415,13 +415,13 @@ class RealOven(Oven):
         heat_on = float(self.time_step * pid)
 
         # make sure relay is on/off for min_relay time
-        if heat_on < self.min_relay:
+        if heat_on > 0 and heat_on < self.min_relay:
             delta = self.min_relay - heat_on
             if delta < self.min_relay / 2.0:
                 heat_on = 0.0
             else:
                 heat_on = self.min_relay
-        elif (self.time_step - heat_on) < self.min_relay:
+        elif heat_on < self.time_step and (self.time_step - heat_on) < self.min_relay:
             delta = self.time_step - heat_on
             if delta >= self.min_relay / 2.0:
                 heat_on = self.time_step - self.min_relay
