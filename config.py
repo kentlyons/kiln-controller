@@ -13,6 +13,9 @@ log_format = '%(asctime)s %(levelname)s %(name)s: %(message)s'
 listening_ip = "0.0.0.0"
 listening_port = 8081
 
+### Watchdog
+watchdog = True
+
 ### Cost Estimate
 kwh_rate        = 0.1319  # Rate in currency_type to calculate cost to run job
 currency_type   = "$"   # Currency Symbol to show when calculating cost to run job

@@ -396,6 +396,10 @@ class RealOven(Oven):
         self.output = Output()
         self.reset()
 
+        self.watchdog = config.watchdog:
+        if self.watchdog:
+            import watchdogdev
+
         # call parent init
         Oven.__init__(self)
 
@@ -405,6 +409,14 @@ class RealOven(Oven):
     def reset(self):
         super().reset()
         self.output.cool(0)
+        if self.watchdog:
+            self.wd.magic_close()
+
+    def run_profile(self):
+        super().run_profile()
+        if self.watchdog:
+            self.wd = watchdogdev.watchdog('/dev/watchdog')
+            self.wd.keep_alive()
 
     def heat_then_cool(self):
         pid = self.pid.compute(self.target,
@@ -451,6 +463,8 @@ class RealOven(Oven):
              self.runtime,
              self.totaltime,
              time_left))
+        if self.watchdog:
+            self.wd.keep_alive()
 
 class Profile():
     def __init__(self, json_data):
