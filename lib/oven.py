@@ -5,6 +5,8 @@ import datetime
 import logging
 import json
 import config
+if config.watchdog:
+    import watchdogdev
 
 log = logging.getLogger(__name__)
 
@@ -394,7 +396,6 @@ class RealOven(Oven):
     def __init__(self):
         self.watchdog = config.watchdog
         if self.watchdog:
-            import watchdogdev
             self.wd = None
 
         self.board = Board()
@@ -407,6 +408,10 @@ class RealOven(Oven):
         # start thread
         self.start()
 
+    def __del__(self):
+        if self.watchdog and self.wd != None:
+            self.wd.magic_close()
+
     def reset(self):
         super().reset()
         self.output.cool(0)
@@ -414,7 +419,7 @@ class RealOven(Oven):
             self.wd.magic_close()
 
     def run_profile(self, profile, startat=0):
-        super().run_profile()
+        super().run_profile(profile, startat)
         if self.watchdog:
             self.wd = watchdogdev.watchdog('/dev/watchdog')
             self.wd.keep_alive()
