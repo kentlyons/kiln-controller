@@ -417,6 +417,7 @@ class RealOven(Oven):
         self.output.cool(0)
         if self.watchdog and self.wd != None:
             self.wd.magic_close()
+            self.wd = None
 
     def run_profile(self, profile, startat=0):
         super().run_profile(profile, startat)
@@ -469,7 +470,7 @@ class RealOven(Oven):
              self.runtime,
              self.totaltime,
              time_left))
-        if self.watchdog:
+        if self.watchdog and self.wd != None:
             self.wd.keep_alive()
 
 class Profile():
