@@ -36,17 +36,16 @@ gpio_heat_2 = 8  # Switches zero-cross solid-state-relay
 ### Thermocouple Adapter selection:
 #   max31855 - bitbang SPI interface
 #   max31856 - bitbang SPI interface. must specify thermocouple_type.
-max6675 = 1
 max31855 = 0
-max31856 = 0
+max31856 = 1
 # see lib/max31856.py for other thermocouple_type, only applies to max31856
-thermocouple_type = MAX31856.MAX31856_S_TYPE
+thermocouple_type = MAX31856.MAX31856_K_TYPE
 
 ### Thermocouple Connection (using bitbang interfaces)
 gpio_sensor_cs = 9
 gpio_sensor_clock = 10
 gpio_sensor_data = 11
-gpio_sensor_di = None # only used with max31856
+gpio_sensor_di = 22 # only used with max31856
 
 ########################################################################
 #
@@ -70,6 +69,9 @@ min_relay_time_wait = 1.5
 pid_kp = 25   # Proportional
 pid_ki = 200  # Integral
 pid_kd = 200  # Derivative
+pid_kp = 5.31778132885673
+pid_ki = 34.50533781066446
+pid_kd = 243.94237172349344
 
 
 ########################################################################
@@ -120,7 +122,7 @@ emergency_shutoff_temp = 2264 #cone 7
 # the desired temperature is reached. If your kiln cannot attain the
 # wanted temperature, the schedule will run forever. This is often used
 # for heating as fast as possible in a section of a kiln schedule/profile.
-kiln_must_catch_up = True
+kiln_must_catch_up = False
 kiln_must_catch_up_max_error = 10 #degrees
 
 # thermocouple offset
