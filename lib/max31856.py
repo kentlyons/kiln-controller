@@ -89,7 +89,7 @@ class MAX31856(object):
     MAX31856_S_TYPE = 0x6 # Read S Type Thermocouple
     MAX31856_T_TYPE = 0x7 # Read T Type Thermocouple
 
-    def __init__(self, tc_type=MAX31856_S_TYPE, units="c", avgsel=0x0, ac_freq_50hz=False, ocdetect=0x1, software_spi=None, hardware_spi=None, gpio=None):
+    def __init__(self, tc_type=MAX31856_K_TYPE, units="c", avgsel=0x0, ac_freq_50hz=False, ocdetect=0x1, software_spi=None, hardware_spi=None, gpio=None):
         """
         Initialize MAX31856 device with software SPI on the specified CLK,
         CS, and DO pins.  Alternatively can specify hardware SPI by sending an
@@ -136,13 +136,29 @@ class MAX31856(object):
         self._spi.set_mode(1)
         self._spi.set_bit_order(SPI.MSBFIRST)
 
-        self.cr0 = self.MAX31856_CR0_READ_CONT | ((ocdetect & 3) << 4) | (1 if ac_freq_50hz else 0)
-        self.cr1 = (((self.avgsel & 7) << 4) + (self.tc_type & 0x0f))
+        self._write_register(self.MAX31856_REG_WRITE_MASK, 0x0)
+        #// enable open circuit fault detection
+        self._write_register(self.MAX31856_REG_WRITE_CR0, 0x10) #MAX31856_CR0_OCFAULT0
+        #// set cold junction temperature offset to zero
+        self._write_register(self.MAX31856_REG_WRITE_CJTO, 0x0)
+        #// set Type K by default
+        self.setThermocoupleType(tc_type) #self.MAX31856_K_TYPE
 
-        # Setup for reading continuously with T-Type thermocouple
-        self._write_register(self.MAX31856_REG_WRITE_CR0, 0)
-        self._write_register(self.MAX31856_REG_WRITE_CR1, self.cr1)
-        self._write_register(self.MAX31856_REG_WRITE_CR0, self.cr0)
+        #// set One-Shot conversion mode
+        self.setConversionMode(self.MAX31856_CR0_READ_ONE)
+        import time
+        time.sleep(3)
+        self.setConversionMode(self.MAX31856_CR0_READ_CONT)
+
+    def setThermocoupleType(self, type):
+        t = (self._read_register(self.MAX31856_REG_READ_CR1) & 0xF0) + type
+        self._write_register(self.MAX31856_REG_WRITE_CR1, t)
+
+    def setConversionMode(self, mode):
+        t = self._read_register(self.MAX31856_REG_READ_CR0) #// get current register value
+        t = t & 0b00111111 # mask top two bits (0x40 and 0x80)
+        t = t | mode
+        self._write_register(self.MAX31856_REG_WRITE_CR0, t); # write value back to register
 
     @staticmethod
     def _cj_temp_from_bytes(msb, lsb):

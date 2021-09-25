@@ -30,22 +30,26 @@ currency_type   = "$"   # Currency Symbol to show when calculating cost to run j
 #   can use whichever GPIO you prefer/have available.
 
 ### Outputs
-gpio_heat = 7  # Switches zero-cross solid-state-relay
-gpio_heat_2 = 8  # Switches zero-cross solid-state-relay
+gpio_heat = 27  # Switches zero-cross solid-state-relay
+gpio_heat_2 = 22  # Switches zero-cross solid-state-relay
 
 ### Thermocouple Adapter selection:
 #   max31855 - bitbang SPI interface
 #   max31856 - bitbang SPI interface. must specify thermocouple_type.
+max6675 = 0
 max31855 = 0
 max31856 = 1
 # see lib/max31856.py for other thermocouple_type, only applies to max31856
 thermocouple_type = MAX31856.MAX31856_K_TYPE
 
 ### Thermocouple Connection (using bitbang interfaces)
-gpio_sensor_cs = 9
-gpio_sensor_clock = 10
-gpio_sensor_data = 11
-gpio_sensor_di = 22 # only used with max31856
+gpio_sensor_cs = None
+gpio_sensor_clock = None
+gpio_sensor_data = None
+gpio_sensor_di = None # only used with max31856
+
+spi_port = 0
+spi_dev = 0
 
 ########################################################################
 #
@@ -66,9 +70,9 @@ min_relay_time_wait = 1.5
 # well with the simulated oven. You must tune them to work well with 
 # your specific kiln. Note that the integral pid_ki is
 # inverted so that a smaller number means more integral action.
-pid_kp = 25   # Proportional
-pid_ki = 200  # Integral
-pid_kd = 200  # Derivative
+#pid_kp = 25   # Proportional
+#pid_ki = 200  # Integral
+#pid_kd = 200  # Derivative
 pid_kp = 5.31778132885673
 pid_ki = 34.50533781066446
 pid_kd = 243.94237172349344

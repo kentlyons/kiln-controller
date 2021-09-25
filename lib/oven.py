@@ -7,6 +7,7 @@ import json
 import config
 if config.watchdog:
     import watchdogdev
+import Adafruit_GPIO.SPI as SPI
 
 log = logging.getLogger(__name__)
 
@@ -129,12 +130,13 @@ class TempSensorReal(TempSensor):
         if config.max31856:
             log.info("init MAX31856")
             from max31856 import MAX31856
-            software_spi = { 'cs': config.gpio_sensor_cs,
-                             'clk': config.gpio_sensor_clock,
-                             'do': config.gpio_sensor_data,
-                             'di': config.gpio_sensor_di }
+            #software_spi = { 'cs': config.gpio_sensor_cs,
+            #                 'clk': config.gpio_sensor_clock,
+            #                 'do': config.gpio_sensor_data,
+            #                 'di': config.gpio_sensor_di }
             self.thermocouple = MAX31856(tc_type=config.thermocouple_type,
-                                         software_spi = software_spi,
+                                         #software_spi = software_spi,
+                                         hardware_spi=SPI.SpiDev(config.spi_port, config.spi_dev),
                                          units = config.temp_scale,
                                          ac_freq_50hz = config.ac_freq_50hz,
                                          )
