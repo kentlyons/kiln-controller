@@ -72,9 +72,9 @@ min_relay_time_wait = 1.5
 #pid_kp = 25   # Proportional
 #pid_ki = 200  # Integral
 #pid_kd = 200  # Derivative
-pid_kp = 5.31778132885673
-pid_ki = 34.50533781066446
-pid_kd = 243.94237172349344
+pid_kp = 8.004
+pid_ki = 20.045
+pid_kd = 321.037
 
 
 ########################################################################
@@ -144,7 +144,7 @@ honour_theromocouple_short_errors = False
 # If you suffer from the high temperature kiln issue and have set 
 # honour_theromocouple_short_errors to False,
 # you will likely need to increase this (eg I use 40)
-temperature_average_samples = 40 
+temperature_average_samples = 30
 
 # Thermocouple AC frequency filtering - set to True if in a 50Hz locale, else leave at False for 60Hz locale
 ac_freq_50hz = False
