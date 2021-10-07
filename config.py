@@ -57,7 +57,8 @@ spi_dev = 0
 # Every N seconds a decision is made about switching the relay[s] 
 # on & off and for how long. The thermocouple is read 
 # temperature_average_samples times during and the average value is used.
-sensor_time_wait = 10
+oven_time_step = 10
+sensor_time_wait = 2
 min_relay_time_wait = 1.5
 
 
@@ -144,7 +145,7 @@ honour_theromocouple_short_errors = False
 # If you suffer from the high temperature kiln issue and have set 
 # honour_theromocouple_short_errors to False,
 # you will likely need to increase this (eg I use 40)
-temperature_average_samples = 30
+temperature_average_samples = 40
 
 # Thermocouple AC frequency filtering - set to True if in a 50Hz locale, else leave at False for 60Hz locale
 ac_freq_50hz = False

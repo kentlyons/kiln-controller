@@ -147,7 +147,7 @@ class MAX31856(object):
         #// set One-Shot conversion mode
         self.setConversionMode(self.MAX31856_CR0_READ_ONE)
         import time
-        time.sleep(3)
+        time.sleep(.5)
         self.setConversionMode(self.MAX31856_CR0_READ_CONT)
 
     def setThermocoupleType(self, type):
@@ -327,6 +327,7 @@ class MAX31856(object):
     def get(self):
         self.checkErrors()
         celcius = self.read_temp_c()
+        self._logger.debug("Themo: %.2f, internal: %.2f" % (self.to_f(celcius), self.to_f(self.read_internal_temp_c())))
         return getattr(self, "to_" + self.units)(celcius)
 
 

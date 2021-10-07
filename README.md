@@ -61,8 +61,8 @@ Download [Raspberry PI OS](https://www.raspberrypi.org/software/). Use Rasberry 
 
     $ sudo apt-get update
     $ sudo apt-get dist-upgrade
-    $ sudo apt-get install python3-virtualenv libevent-dev virtualenv
-    $ git clone https://github.com/jbruce12000/kiln-controller
+    $ sudo apt-get install python3-virtualenv libevent-dev virtualenv watchdog
+    $ git clone https://github.com/kentlyons/kiln-controller
     $ cd kiln-controller
     $ virtualenv -p python3 venv
     $ source venv/bin/activate
@@ -79,6 +79,13 @@ If you want to deploy the code on a PI for production:
     $ virtualenv -p python3 venv
     $ source venv/bin/activate
     $ pip install -r requirements.txt
+
+### RPi
+
+In /boot/config.txt turn on HW spi & pull down GPIO connected to relays
+
+    dtparam=spi=on
+    gpio=22,27=op,dl
 
 
 ## Configuration

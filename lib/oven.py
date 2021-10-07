@@ -1,6 +1,7 @@
 import threading
 import time
 import random
+import statistics
 import datetime
 import logging
 import json
@@ -11,6 +12,8 @@ import Adafruit_GPIO.SPI as SPI
 
 log = logging.getLogger(__name__)
 
+#FIX: get rig of the global at some point
+ON = False
 
 class Output(object):
     def __init__(self):
@@ -32,6 +35,8 @@ class Output(object):
             self.active = False
 
     def heat(self,sleepfor, tuning=False):
+        global ON
+        ON = True
         self.GPIO.output(config.gpio_heat, self.GPIO.HIGH)
         self.GPIO.output(config.gpio_heat_2, self.GPIO.HIGH)
         if tuning:
@@ -39,9 +44,11 @@ class Output(object):
         time.sleep(sleepfor)
 
     def cool(self,sleepfor):
+        global ON
         '''no active cooling, so sleep'''
         self.GPIO.output(config.gpio_heat, self.GPIO.LOW)
         self.GPIO.output(config.gpio_heat_2, self.GPIO.LOW)
+        ON = False
         time.sleep(sleepfor)
 
 # FIX - Board class needs to be completely removed
@@ -137,6 +144,10 @@ class TempSensorReal(TempSensor):
         '''use a moving average of config.temperature_average_samples across the time_step'''
         temps = []
         while True:
+            # if relays/elements are on, skip reading the temp (bad values)
+            if ON == True:
+                time.sleep(.1)
+                continue
             # reset error counter if time is up
             if (time.time() - self.bad_stamp) > (self.time_step * 2):
                 if self.bad_count + self.ok_count:
@@ -167,8 +178,10 @@ class TempSensorReal(TempSensor):
                 log.error("Problem reading temp N/C:%s GND:%s VCC:%s ???:%s" % (self.noConnection,self.shortToGround,self.shortToVCC,self.unknownError))
                 self.bad_count += 1
 
+            # was using mean, and with temperature sensor errors it will under report
+            # instead use the median for the window
             if len(temps):
-                self.temperature = sum(temps) / len(temps)
+                self.temperature = statistics.median(temps)
             time.sleep(self.sleeptime)
 
 class Oven(threading.Thread):
@@ -178,7 +191,7 @@ class Oven(threading.Thread):
         threading.Thread.__init__(self)
         self.daemon = True
         self.temperature = 0
-        self.time_step = config.sensor_time_wait
+        self.time_step = config.oven_time_step
         self.min_relay = config.min_relay_time_wait
         self.reset()
 
@@ -256,13 +269,15 @@ class Oven(threading.Thread):
             log.info("emergency!!! temperature too high, shutting down")
             self.reset()
 
+        #race condition here too?
         if self.board.temp_sensor.noConnection:
             log.info("emergency!!! lost connection to thermocouple, shutting down")
             self.reset()
 
-        if self.board.temp_sensor.unknownError:
-            log.info("emergency!!! unknown thermocouple error, shutting down")
-            self.reset()
+        #race condition here
+        #if self.board.temp_sensor.unknownError:
+        #    log.info("emergency!!! unknown thermocouple error, shutting down")
+        #    self.reset()
 
         if self.board.temp_sensor.bad_percent > 30:
             log.info("emergency!!! too many errors in a short period, shutting down")
@@ -449,6 +464,10 @@ class RealOven(Oven):
         self.heat = 0.0
         if heat_on > 0:
             self.heat = heat_on
+
+        #FIX: for temp sensor - not right since doesnt add to full time now. but good enough for now
+        if heat_off < self.min_relay:
+            heat_off = self.min_relay
 
         if heat_on:
             self.output.heat(heat_on)
